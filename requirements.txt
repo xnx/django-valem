@@ -1,0 +1,2 @@
+pyvalem==2.3.0
+django-pyref==0.5.0
