@@ -13,3 +13,4 @@ geckodriver.log
 .venv
 build/
 dist/
+django_valem.egg-info/
