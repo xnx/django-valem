@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import django_valem.utils.models
+import dv_utils.models
 
 
 class Migration(migrations.Migration):
@@ -24,6 +24,6 @@ class Migration(migrations.Migration):
                 ('reaction', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='rxn.reaction')),
                 ('refs', models.ManyToManyField(to='refs.Ref')),
             ],
-            bases=(models.Model, django_valem.utils.models.QualifiedIDMixin, django_valem.utils.models.ProvenanceMixin),
+            bases=(models.Model, dv_utils.models.QualifiedIDMixin, dv_utils.models.ProvenanceMixin),
         ),
     ]

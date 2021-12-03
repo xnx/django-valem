@@ -1,6 +1,6 @@
 from django.db import models
-from django_valem.utils.models import ProvenanceMixin, QualifiedIDMixin
-from django_valem.rxn.models import Reaction
+from dv_utils.models import ProvenanceMixin, QualifiedIDMixin
+from rxn.models import Reaction
 from refs.models import Ref
 
 

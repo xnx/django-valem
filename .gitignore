@@ -14,3 +14,4 @@ geckodriver.log
 build/
 dist/
 django_valem.egg-info/
+.idea

@@ -2,7 +2,7 @@ from django.db import models
 from pyvalem.stateful_species import StatefulSpecies
 from pyvalem.formula import Formula
 
-from django_valem.utils.models import QualifiedIDMixin
+from dv_utils.models import QualifiedIDMixin
 
 
 class Species(QualifiedIDMixin, models.Model):

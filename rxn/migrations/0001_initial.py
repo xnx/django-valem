@@ -2,7 +2,7 @@
 
 from django.db import migrations, models
 import django.db.models.deletion
-import django_valem.utils.models
+import dv_utils.models
 
 
 class Migration(migrations.Migration):
@@ -52,7 +52,7 @@ class Migration(migrations.Migration):
                 ('products', models.ManyToManyField(related_name='products_related', through='rxn.ProductList', to='rp.RP')),
                 ('reactants', models.ManyToManyField(related_name='reactants_related', through='rxn.ReactantList', to='rp.RP')),
             ],
-            bases=(models.Model, django_valem.utils.models.QualifiedIDMixin),
+            bases=(models.Model, dv_utils.models.QualifiedIDMixin),
         ),
         migrations.AddField(
             model_name='reactantlist',
