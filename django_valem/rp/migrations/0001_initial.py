@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('text', models.CharField(max_length=80)),
                 ('html', models.CharField(max_length=200)),
-                ('charge', models.SmallIntegerField(default=0)),
+                ('charge', models.SmallIntegerField(default=0, null=True)),
             ],
         ),
         migrations.CreateModel(
@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, serialize=False)),
                 ('state_type', models.SmallIntegerField(choices=[(0, 'KeyValuePair'), (1, 'GenericExcitedState'), (2, 'AtomicConfiguration'), (3, 'AtomicTermSymbol'), (4, 'DiatomicMolecularConfiguration'), (5, 'MolecularTermSymbol'), (6, 'VibrationalState'), (10, 'RotationalState'), (11, 'RacahSymbol')])),
-                ('text', models.CharField(max_length=32)),
+                ('text', models.CharField(max_length=64)),
                 ('html', models.CharField(max_length=100)),
                 ('rp', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='rp.rp')),
             ],
