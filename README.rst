@@ -39,7 +39,7 @@ apps into the ``INSTALLED_APPS`` list in the ``settings.py`` of the project:
     "rp",  # App handling species and their states
     "rxn",  # App handling chemical reactions between species (rp.RP instances)
     "ds",  # App handling datasets attached to rxn.Reaction instances
-    "refs",  # App handling references for ds.ReactionDataSet instances
+    "refs",  # App handling references for ds.ReactionDataSet subclasses instances
     ]
 
 
