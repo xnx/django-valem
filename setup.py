@@ -9,7 +9,8 @@ long_description = (root / "README.rst").read_text(encoding="utf-8")
 setup(
     name="django-valem",
     version="0.0.2",
-    description="A collection of Django apps defining data models for managing chemical species, reactions and datasets.",
+    description="A collection of Django apps defining data models for managing "
+    "chemical species, reactions and datasets.",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/xnx/django-valem",
