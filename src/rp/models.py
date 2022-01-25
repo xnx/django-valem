@@ -1,8 +1,8 @@
 from django.db import models
-from pyvalem.stateful_species import StatefulSpecies
 from pyvalem.formula import Formula
+from pyvalem.stateful_species import StatefulSpecies
 
-from django_valem.utils.models import QualifiedIDMixin
+from _utils.models import QualifiedIDMixin
 
 
 class Species(QualifiedIDMixin, models.Model):
@@ -13,10 +13,6 @@ class Species(QualifiedIDMixin, models.Model):
     text = models.CharField(max_length=80)
     html = models.CharField(max_length=200)
     charge = models.SmallIntegerField(default=0, null=True)
-
-
-#    class Meta:
-#        app_label = 'rp'
 
     def __str__(self):
         return self.text

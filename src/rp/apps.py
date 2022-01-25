@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class UtilsConfig(AppConfig):
+class RpConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'django_valem.utils'
+    name = 'rp'

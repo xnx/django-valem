@@ -3,8 +3,8 @@ import warnings
 from django.db import models
 from pyvalem.reaction import Reaction as PVReaction
 
-from django_valem.rp.models import RP
-from django_valem.utils.models import QualifiedIDMixin
+from _utils.models import QualifiedIDMixin
+from rp.models import RP
 
 
 class ProcessType(QualifiedIDMixin, models.Model):

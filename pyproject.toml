@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=43", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules --doctest-glob='README.rst'"
+
+[tool.coverage.run]
+omit = ["tests/*", "src/pyvalem/__init__.py", "doc/*"]
+
+[tool.coverage.html]
+directory = "htmlcov"
