@@ -235,3 +235,9 @@ class TestRP(TestCase):
             # assert that no new RPs and States were created
             self.assertEqual(len(RP.objects.all()), num_rps + 1)
             self.assertEqual(len(State.objects.all()), num_states + 1)
+
+    def test_charge(self):
+        self.assertEqual(RP.get_or_create_from_text("H").charge, 0)
+        self.assertEqual(RP.get_or_create_from_text("H+").charge, 1)
+        self.assertEqual(RP.get_or_create_from_text("He+2").charge, 2)
+        self.assertEqual(RP.get_or_create_from_text("He-2").charge, -2)

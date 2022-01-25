@@ -72,8 +72,8 @@ Always make sure to format your code before submitting a pull request, by runnin
 ``black`` on all your python files, or ``black .`` from the project source directory.
 
 If the ``rp.models.py``, or ``rxn.models.py`` are changed, the ``makemigrations.py``
-needs to be run to make migrations for the apps, before the apps are pushed to master,
-or published to PyPI.
+script needs to be run to make migrations for the apps, before the apps are pushed to
+master, or published to PyPI.
 
 
 .. _GitHub: https://github.com/xnx/django-valem
