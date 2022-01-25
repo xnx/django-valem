@@ -40,8 +40,7 @@ setup(
         "pyvalem>=2.4.0",
         "django-pyref>=0.5.1",
     ],
-    extras_require={"dev": ["black", "pytest-cov", "tox", "ipython", "django==3"]},
-    # package_data will include all the resolved globs into both the wheel and sdist
+    extras_require={"dev": ["black", "django==3"]},
     project_urls={
         "Bug Reports": "https://github.com/xnx/django-valem/issues",
     },
