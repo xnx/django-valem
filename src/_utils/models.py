@@ -3,16 +3,15 @@ from django.db import models
 
 # noinspection PyUnresolvedReferences
 class QualifiedIDMixin:
-    qid_prefix = '-'
+    qid_prefix = "-"
 
     @property
     def qualified_id(self):
-        return f'{self.qid_prefix}{self.id}'
+        return f"{self.qid_prefix}{self.id}"
 
     def __repr__(self):
-        """By default, prepend the qualified ID to the class' __repr__()
-        """
-        return f'<{self.qualified_id}: {self}>'
+        """By default, prepend the qualified ID to the class' __repr__()"""
+        return f"<{self.qualified_id}: {self}>"
 
 
 class ProvenanceMixin:

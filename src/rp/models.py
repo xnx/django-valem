@@ -6,7 +6,7 @@ from _utils.models import QualifiedIDMixin
 
 
 class Species(QualifiedIDMixin, models.Model):
-    qid_prefix = 'F'
+    qid_prefix = "F"
 
     id = models.AutoField(primary_key=True)
 
@@ -38,13 +38,13 @@ class Species(QualifiedIDMixin, models.Model):
             # text to canonicalise html also:
             pyvalem_formula = Formula(text_can)
             species = cls.objects.create(
-                text=text_can, charge=pyvalem_formula.charge,
-                html=pyvalem_formula.html)
+                text=text_can, charge=pyvalem_formula.charge, html=pyvalem_formula.html
+            )
         return species
 
 
 class RP(QualifiedIDMixin, models.Model):
-    qid_prefix = 'RP'
+    qid_prefix = "RP"
 
     id = models.AutoField(primary_key=True)
     species = models.ForeignKey(Species, on_delete=models.CASCADE)
@@ -79,14 +79,17 @@ class RP(QualifiedIDMixin, models.Model):
             # with the text and html:
             pyvalem_stateful_species = StatefulSpecies(text_can)
             # build the RP instance:
-            rp = cls.objects.create(species=species, text=text_can,
-                                    html=pyvalem_stateful_species.html)
+            rp = cls.objects.create(
+                species=species, text=text_can, html=pyvalem_stateful_species.html
+            )
             # attach the states:
             for pyvalem_state in pyvalem_stateful_species.states:
                 State.objects.create(
-                    rp=rp, text=repr(pyvalem_state), html=pyvalem_state.html,
-                    state_type=State.STATE_TYPE_MAP[
-                        pyvalem_state.__class__.__name__])
+                    rp=rp,
+                    text=repr(pyvalem_state),
+                    html=pyvalem_state.html,
+                    state_type=State.STATE_TYPE_MAP[pyvalem_state.__class__.__name__],
+                )
         return rp
 
     @property
@@ -96,7 +99,7 @@ class RP(QualifiedIDMixin, models.Model):
 
 
 class State(QualifiedIDMixin, models.Model):
-    qid_prefix = 'S'
+    qid_prefix = "S"
 
     KEY_VALUE_PAIR = 0
     GENERIC_EXCITED_STATE = 1
@@ -109,15 +112,15 @@ class State(QualifiedIDMixin, models.Model):
     RACAH_SYMBOL = 11
 
     STATE_TYPE_CHOICES = (
-        (KEY_VALUE_PAIR, 'KeyValuePair'),
-        (GENERIC_EXCITED_STATE, 'GenericExcitedState'),
-        (ATOMIC_CONFIGURATION, 'AtomicConfiguration'),
-        (ATOMIC_TERM_SYMBOL, 'AtomicTermSymbol'),
-        (DIATOMIC_MOLECULAR_CONFIGURATION, 'DiatomicMolecularConfiguration'),
-        (MOLECULAR_TERM_SYMBOL, 'MolecularTermSymbol'),
-        (VIBRATIONAL_STATE, 'VibrationalState'),
-        (ROTATIONAL_STATE, 'RotationalState'),
-        (RACAH_SYMBOL, 'RacahSymbol'),
+        (KEY_VALUE_PAIR, "KeyValuePair"),
+        (GENERIC_EXCITED_STATE, "GenericExcitedState"),
+        (ATOMIC_CONFIGURATION, "AtomicConfiguration"),
+        (ATOMIC_TERM_SYMBOL, "AtomicTermSymbol"),
+        (DIATOMIC_MOLECULAR_CONFIGURATION, "DiatomicMolecularConfiguration"),
+        (MOLECULAR_TERM_SYMBOL, "MolecularTermSymbol"),
+        (VIBRATIONAL_STATE, "VibrationalState"),
+        (ROTATIONAL_STATE, "RotationalState"),
+        (RACAH_SYMBOL, "RacahSymbol"),
     )
 
     STATE_TYPE_MAP = {v: k for k, v in STATE_TYPE_CHOICES}

@@ -6,7 +6,7 @@ from rxn.models import Reaction
 
 
 class ReactionDataSet(QualifiedIDMixin, ProvenanceMixin, models.Model):
-    qid_prefix = 'D'
+    qid_prefix = "D"
 
     id = models.AutoField(primary_key=True)
     reaction = models.ForeignKey(Reaction, on_delete=models.CASCADE)
