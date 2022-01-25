@@ -55,17 +55,12 @@ installed into the virtual environment in editable mode with
     pip install -e .[dev]
 
 The ``[dev]`` extra installs (apart from the package dependencies) also several
-development-related packages, such as ``pytest-cov``, ``black``, ``tox``, ``ipython``,
-or ``django`` itself.
+development-related packages, such as ``black``, ``ipython``, or ``django`` itself.
 The tests can then be executed by running (from the project root directory)
 
 .. code-block:: bash
 
-    # either
-    pytest
-
-    # or
-    tox
+    python runtests.py
 
 The project does not have ``requirements.txt`` by design, all the package dependencies
 are rather handled by ``setup.py``.
@@ -75,6 +70,10 @@ another layer of usefulness.
 The project code is formatted by ``black``.
 Always make sure to format your code before submitting a pull request, by running
 ``black`` on all your python files, or ``black .`` from the project source directory.
+
+If the ``rp.models.py``, or ``rxn.models.py`` are changed, the ``makemigrations.py``
+needs to be run to make migrations for the apps, before the apps are pushed to master,
+or published to PyPI.
 
 
 .. _GitHub: https://github.com/xnx/django-valem
