@@ -10,9 +10,14 @@ class ReactionDataSet(QualifiedIDMixin, ProvenanceMixin, models.Model):
     id = models.AutoField(primary_key=True)
     reaction = models.ForeignKey(Reaction, on_delete=models.CASCADE)
     refs = models.ManyToManyField(Ref)
-    comment = models.TextField(null=True, blank=True)
+    json_comment = models.TextField(null=True, blank=True)
 
     json_data = models.TextField(null=True, blank=True)
+
+
+    class Meta:
+        abstract = True
+
 
     def __str__(self):
         return str(self.reaction)
