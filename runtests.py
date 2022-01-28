@@ -7,9 +7,12 @@ from django.test.utils import get_runner
 from coverage import Coverage
 
 if __name__ == "__main__":
-    cov = Coverage()
-    cov.erase()
-    cov.start()
+    run_coverage = "-nocov" not in sys.argv
+
+    if run_coverage:
+        cov = Coverage()
+        cov.erase()
+        cov.start()
 
     os.environ["DJANGO_SETTINGS_MODULE"] = "tests.settings"
     django.setup()
@@ -19,9 +22,11 @@ if __name__ == "__main__":
 
     failures = test_runner.run_tests(["tests"])
 
-    cov.stop()
-    cov.save()
-    covered = cov.report()
-    cov.html_report()
+    if run_coverage:
+        # noinspection PyUnboundLocalVariable
+        cov.stop()
+        cov.save()
+        covered = cov.report()
+        cov.html_report()
 
     sys.exit(bool(failures))

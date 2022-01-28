@@ -27,7 +27,7 @@ jobs:
         pip install django==3
     - name: Test with pytest
       run: |
-        python runtests.py
+        python runtests.py -nocov
     - name: Check code format
       run: |
         black --check .
