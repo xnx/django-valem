@@ -8,7 +8,7 @@ long_description = (root / "README.rst").read_text(encoding="utf-8")
 
 setup(
     name="django-valem",
-    version="0.0.2",
+    version="0.1.0",
     description="A collection of Django apps defining data models for managing "
     "chemical species, reactions and datasets.",
     long_description=long_description,
@@ -17,7 +17,7 @@ setup(
     author="Christian Hill",
     author_email="ch.hill@iaea.org",
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Science/Research",
         "Topic :: Scientific/Engineering :: Chemistry",
         "Topic :: Scientific/Engineering :: Physics",
