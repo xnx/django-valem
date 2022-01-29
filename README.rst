@@ -34,12 +34,12 @@ apps into the ``INSTALLED_APPS`` list in the ``settings.py`` of the project:
 .. code-block:: python
 
     INSTALLED_APPS = [
-    ...
+        ...
 
-    "rp",  # App handling species and their states
-    "rxn",  # App handling chemical reactions between species (rp.RP instances)
-    "ds",  # App handling datasets attached to rxn.Reaction instances
-    "refs",  # App handling references for ds.ReactionDataSet subclasses instances
+        "rp",  # App handling species and their states
+        "rxn",  # App handling chemical reactions between species (rp.RP instances)
+        "ds",  # App handling datasets attached to rxn.Reaction instances
+        "refs",  # App handling references for ds.ReactionDataSet subclasses instances
     ]
 
 
