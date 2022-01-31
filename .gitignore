@@ -2,6 +2,19 @@
 # Created by https://www.toptal.com/developers/gitignore/api/django
 # Edit at https://www.toptal.com/developers/gitignore?templates=django
 
+### Added by Christian ###
+.DS_Store
+*.pyo
+*.swp
+*.swo
+*.swm
+*.swn
+*.swl
+*.db
+.sass-cache
+.mysql-password
+conf.py
+
 ### Django ###
 *.log
 *.pot
