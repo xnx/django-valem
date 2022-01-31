@@ -1,36 +1,47 @@
-import os
 from setuptools import setup, find_packages
+from pathlib import Path
 
-long_description = """
-django-valem is a Python package for managing chemical reactions, collisional
-processes, etc.
+root = Path(__file__).parent.resolve()
 
-See https://github.com/xnx/django-valem for more information.
-"""
-
-# Read in dependencies list from requirements.txt
-thelibFolder = os.path.dirname(os.path.realpath(__file__))
-requirementPath = thelibFolder + '/requirements.txt'
-install_requires = []
-if os.path.isfile(requirementPath):
-    with open(requirementPath) as f:
-        install_requires = f.read().splitlines()
+# Get the long description from the README file
+long_description = (root / "README.rst").read_text(encoding="utf-8")
 
 setup(
-    name = 'django-valem',
-    version = '0.0.1',
-    author = 'Christian Hill, Martin Hanicinec, Dipti',
-    author_email = 'xn.hill@gmail.com',
-    description = 'A package for managing chemical reactions and species',
+    name="django-valem",
+    version="0.1.0",
+    description="A collection of Django apps defining data models for managing "
+    "chemical species, reactions and datasets.",
     long_description=long_description,
-    long_description_content_type="text/markdown",
-    #include_package_data=True,
-    url = 'https://github.com/xnx/django-valem',
-    packages = find_packages(),
-    install_requires=install_requires,
+    long_description_content_type="text/x-rst",
+    url="https://github.com/xnx/django-valem",
+    author="Christian Hill",
+    author_email="ch.hill@iaea.org",
     classifiers=[
-        "Programming Language :: Python :: 3",
+        "Development Status :: 3 - Alpha",
+        "Intended Audience :: Science/Research",
+        "Topic :: Scientific/Engineering :: Chemistry",
+        "Topic :: Scientific/Engineering :: Physics",
         "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3 :: Only",
+        "Framework :: Django",
+        "Operating System :: OS Independent",
     ],
-    python_requires='>=3.6',
+    keywords="django, chemistry, formula, species, state, reaction",
+    package_dir={"": "src"},
+    packages=find_packages(where="src"),
+    python_requires=">=3.6",
+    install_requires=[
+        "pyvalem>=2.4.0",
+        "django-pyref>=0.5.1",
+    ],
+    extras_require={"dev": ["black", "coverage", "django==3", "ipython"]},
+    project_urls={
+        "Bug Reports": "https://github.com/xnx/django-valem/issues",
+    },
 )
