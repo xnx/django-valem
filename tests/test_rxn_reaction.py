@@ -17,6 +17,16 @@ class TestReaction(TestCase):
         self.pt_oth = ProcessType.objects.create(
             abbreviation="___", description="", example_html=""
         )
+        ProcessType.objects.create(
+            abbreviation="ENI",
+            description="Negative Ion Formation",
+            example_html="e- + A → A-",
+        )
+        ProcessType.objects.create(
+            abbreviation="EDS",
+            description="Electron-Impact Dissociation",
+            example_html="e- + AB → A + B + e-",
+        )
 
     def test_all_from_text_single(self):
         r_str = "H + H + He -> H + H **;n=2 + He *;n=0"
@@ -85,6 +95,41 @@ class TestReaction(TestCase):
         self.assertEqual(len(State.objects.all()), 2)
         self.assertEqual(len(Species.objects.all()), 2)
         self.assertEqual(len(Reaction.objects.all()), 1)
+
+    def test_get_or_create_rxn(self):
+        r1, created = Reaction.get_or_create_from_text(
+            "H2 + e- -> H + H-", comment="the first"
+        )
+        self.assertEqual(str(r1), "e- + H2 → H + H-")
+        self.assertTrue(created)
+        r2, created = Reaction.get_or_create_from_text(
+            "e- + H2 -> H + H-", comment="the first"
+        )
+        self.assertEqual(r1, r2)
+        self.assertFalse(created)
+        r3, created = Reaction.get_or_create_from_text(
+            "H2 + e- -> H + H-", comment="the second"
+        )
+        self.assertNotEqual(r1, r3)
+        self.assertTrue(created)
+
+        r1, created = Reaction.get_or_create_from_text(
+            "H2 + e- -> H + H-", process_type_abbreviations=("EDS",)
+        )
+        self.assertEqual(str(r1), "e- + H2 → H + H-")
+        self.assertTrue(created)
+        r2, created = Reaction.get_or_create_from_text(
+            "H2 + e- -> H + H-", process_type_abbreviations=("EDS",)
+        )
+        self.assertEqual(str(r2), "e- + H2 → H + H-")
+        self.assertEqual(r1, r2)
+        self.assertFalse(created)
+        r3, created = Reaction.get_or_create_from_text(
+            "e- + H2 -> H + H-", process_type_abbreviations=("EDS", "ENI")
+        )
+        self.assertEqual(str(r3), "e- + H2 → H + H-")
+        self.assertNotEqual(r1, r3)
+        self.assertTrue(created)
 
     def test_molecularity(self):
         reaction = Reaction.create_from_text("5H + 5e- -> H- + H- + 3H-")

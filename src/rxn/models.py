@@ -66,7 +66,7 @@ class Reaction(QualifiedIDMixin, models.Model):
         to exist with different comments and process types.
         If some of the species from the reaction text do not exist, they
         will be created to create the reaction.
-        The process types with abbreviations passed must exits already."""
+        The process types with abbreviations passed must exist already."""
         process_types = [
             ProcessType.objects.get(abbreviation=abbrev)
             for abbrev in process_type_abbreviations
@@ -79,7 +79,7 @@ class Reaction(QualifiedIDMixin, models.Model):
             msg = (
                 f'Creating a new instance of reaction "{text}" '
                 f"({comment}, {process_type_abbreviations}), "
-                f"while the following reactions are already present"
+                f"while the following reactions are already present "
                 f"in the database:\n"
             )
             for r in found_instances:
@@ -109,6 +109,22 @@ class Reaction(QualifiedIDMixin, models.Model):
             reaction.process_types.add(process_type)
 
         return reaction
+
+    @classmethod
+    def get_or_create_from_text(cls, text, comment="", process_type_abbreviations=()):
+        found_instances = cls.all_from_text(text).filter(comment=comment)
+        if process_type_abbreviations:
+            process_type_abbreviations = set(process_type_abbreviations)
+            for instance in found_instances:
+                these_process_type_abbrevs = set(
+                    process_type.abbreviation
+                    for process_type in instance.process_types.all()
+                )
+                if these_process_type_abbrevs == process_type_abbreviations:
+                    return instance, False
+        elif found_instances:
+            return found_instances[0], False
+        return (cls.create_from_text(text, comment, process_type_abbreviations), True)
 
     @property
     def molecularity(self):
