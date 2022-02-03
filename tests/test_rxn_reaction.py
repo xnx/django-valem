@@ -96,41 +96,40 @@ class TestReaction(TestCase):
         self.assertEqual(len(Species.objects.all()), 2)
         self.assertEqual(len(Reaction.objects.all()), 1)
 
-
     def test_get_or_create_rxn(self):
         r1, created = Reaction.get_or_create_from_text(
-                                "H2 + e- -> H + H-", comment="the first")
+            "H2 + e- -> H + H-", comment="the first"
+        )
         self.assertEqual(str(r1), "e- + H2 → H + H-")
         self.assertTrue(created)
         r2, created = Reaction.get_or_create_from_text(
-                                "e- + H2 -> H + H-", comment="the first")
+            "e- + H2 -> H + H-", comment="the first"
+        )
         self.assertEqual(r1, r2)
         self.assertFalse(created)
         r3, created = Reaction.get_or_create_from_text(
-                                "H2 + e- -> H + H-", comment="the second")
+            "H2 + e- -> H + H-", comment="the second"
+        )
         self.assertNotEqual(r1, r3)
         self.assertTrue(created)
 
-
         r1, created = Reaction.get_or_create_from_text(
-                                "H2 + e- -> H + H-",
-                                process_type_abbreviations=('EDS',))
+            "H2 + e- -> H + H-", process_type_abbreviations=("EDS",)
+        )
         self.assertEqual(str(r1), "e- + H2 → H + H-")
         self.assertTrue(created)
         r2, created = Reaction.get_or_create_from_text(
-                                "H2 + e- -> H + H-",
-                                process_type_abbreviations=('EDS',))
+            "H2 + e- -> H + H-", process_type_abbreviations=("EDS",)
+        )
         self.assertEqual(str(r2), "e- + H2 → H + H-")
         self.assertEqual(r1, r2)
         self.assertFalse(created)
         r3, created = Reaction.get_or_create_from_text(
-                                "e- + H2 -> H + H-",
-                                process_type_abbreviations=('EDS', 'ENI'))
+            "e- + H2 -> H + H-", process_type_abbreviations=("EDS", "ENI")
+        )
         self.assertEqual(str(r3), "e- + H2 → H + H-")
         self.assertNotEqual(r1, r3)
         self.assertTrue(created)
-
-        
 
     def test_molecularity(self):
         reaction = Reaction.create_from_text("5H + 5e- -> H- + H- + 3H-")

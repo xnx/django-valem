@@ -110,23 +110,21 @@ class Reaction(QualifiedIDMixin, models.Model):
 
         return reaction
 
-
     @classmethod
-    def get_or_create_from_text(cls, text, comment="",
-                                process_type_abbreviations=()):
+    def get_or_create_from_text(cls, text, comment="", process_type_abbreviations=()):
         found_instances = cls.all_from_text(text).filter(comment=comment)
         if process_type_abbreviations:
             process_type_abbreviations = set(process_type_abbreviations)
             for instance in found_instances:
-                these_process_type_abbrevs = set(process_type.abbreviation
-                                for process_type in instance.process_types.all())
+                these_process_type_abbrevs = set(
+                    process_type.abbreviation
+                    for process_type in instance.process_types.all()
+                )
                 if these_process_type_abbrevs == process_type_abbreviations:
                     return instance, False
         elif found_instances:
             return found_instances[0], False
-        return (cls.create_from_text(text, comment, process_type_abbreviations),
-               True)
-        
+        return (cls.create_from_text(text, comment, process_type_abbreviations), True)
 
     @property
     def molecularity(self):
