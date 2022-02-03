@@ -52,7 +52,16 @@ class Reaction(QualifiedIDMixin, models.Model):
     def all_from_text(cls, text):
         """Uses pyvalem to get a canonicalised version of the text and filters
         the database objects by that text. If no reactions equivalent to passed
-        text are found, returns an empty query."""
+        text are found, returns an empty query.
+
+        Parameters
+        ----------
+        text : str
+
+        Returns
+        -------
+        Query
+        """
         text_can = repr(PVReaction(text))
         return cls.objects.filter(text=text_can)
 
@@ -62,6 +71,16 @@ class Reaction(QualifiedIDMixin, models.Model):
         identical comment AND the same process_type_abbreviations.
         So this should be strictly named "get_from_data" but we'll keep it like this
         for consistency reasons.
+
+        Parameters
+        ----------
+        text : str
+        comment : str
+        process_type_abbreviations : tuple of str
+
+        Returns
+        -------
+        Reaction
         """
         text_can = repr(PVReaction(text))
         all_with_text_and_comment = cls.objects.filter(text=text_can, comment=comment)
@@ -74,8 +93,20 @@ class Reaction(QualifiedIDMixin, models.Model):
 
     @classmethod
     def get_or_create_from_text(cls, text, comment="", process_type_abbreviations=()):
+        """
+
+        Parameters
+        ----------
+        text : str
+        comment : str
+        process_type_abbreviations : tuple of str
+
+        Returns
+        -------
+        (Reaction, bool)
+        """
         try:
-            reaction = cls.get_from_text(text, comment, process_type_abbreviations)
+            return cls.get_from_text(text, comment, process_type_abbreviations), False
         except cls.DoesNotExist:
             # canonicalised text and html:
             text_can = repr(PVReaction(text))
@@ -91,7 +122,7 @@ class Reaction(QualifiedIDMixin, models.Model):
                     for _ in range(stoich):
                         Intermediate.objects.create(
                             reaction=reaction,
-                            rp=RP.get_or_create_from_text(repr(stateful_species)),
+                            rp=RP.get_or_create_from_text(repr(stateful_species))[0],
                         )
             # assign the ProcessTypes:
             process_types = [
@@ -101,7 +132,7 @@ class Reaction(QualifiedIDMixin, models.Model):
             for process_type in process_types:
                 reaction.process_types.add(process_type)
 
-        return reaction
+            return reaction, True
 
     @property
     def molecularity(self):

@@ -24,7 +24,7 @@ class TestReactionDataSet(TestCase):
             )
             self.all_process_types[abbreviation] = pt
 
-        self.test_reaction = Reaction.get_or_create_from_text(
+        self.test_reaction, _ = Reaction.get_or_create_from_text(
             "BeH+ v=0 + e- -> BeH+ v=10 + e-", process_type_abbreviations=("EEX", "EXV")
         )
 

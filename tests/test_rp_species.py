@@ -97,7 +97,8 @@ class TestSpecies(TestCase):
 
             with self.subTest(formula_text=text):
                 # create the species
-                species = Species.get_or_create_from_text(text)
+                species, created = Species.get_or_create_from_text(text)
+                self.assertTrue(created)
                 formula = Formula(text)
                 # how does the species look?
                 self.assertEqual(species.text, text)
@@ -107,6 +108,7 @@ class TestSpecies(TestCase):
                 self.assertEqual(len(Species.objects.all()), initial_num_species + 1)
                 self.assertEqual(species, Species.get_from_text(text))
                 # will the species not be created again?
-                species1 = Species.get_or_create_from_text(text)
+                species1, created = Species.get_or_create_from_text(text)
+                self.assertFalse(created)
                 self.assertEqual(len(Species.objects.all()), initial_num_species + 1)
                 self.assertEqual(species1, species)

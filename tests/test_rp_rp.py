@@ -90,7 +90,8 @@ class TestRP(TestCase):
     def test_get_or_create_from_text_one_state(self):
         # RP creating
         rp_text = "H2+ *"
-        rp = RP.get_or_create_from_text(rp_text)
+        rp, created = RP.get_or_create_from_text(rp_text)
+        self.assertTrue(created)
         self.assertEqual(len(RP.objects.all()), 1)
         # check the RP instance:
         self.assertEqual(rp.species.text, "H2+")
@@ -105,7 +106,8 @@ class TestRP(TestCase):
         # in multiple RP instances.
         rp_text = "H2 *;n=1;v=1"
         self.assertEqual(len(RP.objects.all()), 0)
-        rp = RP.get_or_create_from_text(rp_text)
+        rp, created = RP.get_or_create_from_text(rp_text)
+        self.assertTrue(created)
         num_rps = 1
         self.assertEqual(len(RP.objects.all()), num_rps)
         num_species = len(Species.objects.all())
@@ -119,7 +121,9 @@ class TestRP(TestCase):
             "v=1;*;n=1",
             "v=1;n=1;*",
         ]:
-            self.assertEqual(RP.get_or_create_from_text(f"H2 {states_combo}"), rp)
+            rp_new, created = RP.get_or_create_from_text(f"H2 {states_combo}")
+            self.assertEqual(rp_new, rp)
+            self.assertFalse(created)
         # no new species, states or rp instances created:
         self.assertEqual(len(RP.objects.all()), num_rps)
         self.assertEqual(len(State.objects.all()), num_states)
@@ -133,7 +137,8 @@ class TestRP(TestCase):
         num_species = len(Species.objects.all())
         num_states = len(State.objects.all())
         # Create RP instance with existing species
-        RP.get_or_create_from_text(f"{species_text} key=value")
+        _, created = RP.get_or_create_from_text(f"{species_text} key=value")
+        self.assertTrue(created)
         # No new species were created
         self.assertEqual(len(Species.objects.all()), num_species)
         # New states were created
@@ -157,38 +162,39 @@ class TestRP(TestCase):
 
     def test_text_attribute(self):
         rp_text = "(235U) l=0;n=1;***"
-        rp = RP.get_or_create_from_text(rp_text)
+        rp, _ = RP.get_or_create_from_text(rp_text)
         text = rp.text
         rp.delete()
         with self.assertRaises(RP.DoesNotExist):
             RP.get_from_text(rp_text)
 
         equivalent_text = "(235U) l=0;***;n=1"
-        rp = RP.get_or_create_from_text(equivalent_text)
+        rp, created = RP.get_or_create_from_text(equivalent_text)
+        self.assertTrue(created)
         text_equivalent = rp.text
 
         self.assertEqual(text, text_equivalent)
 
     def test_html_attribute(self):
         rp_text = "(235U) n=2;3P"
-        rp = RP.get_or_create_from_text(rp_text)
+        rp, _ = RP.get_or_create_from_text(rp_text)
         html = rp.text
         rp.delete()
         with self.assertRaises(RP.DoesNotExist):
             RP.get_from_text(rp_text)
 
         equivalent_text = "(235U) 3P;n=2"
-        rp = RP.get_or_create_from_text(equivalent_text)
+        rp, _ = RP.get_or_create_from_text(equivalent_text)
         html_equivalent = rp.text
 
         self.assertEqual(html, html_equivalent)
 
     def test_str(self):
-        rp = RP.get_or_create_from_text("H *")
+        rp, _ = RP.get_or_create_from_text("H *")
         self.assertEqual(str(rp), rp.text)
 
     def test_repr(self):
-        rp = RP.get_or_create_from_text("H *")
+        rp, _ = RP.get_or_create_from_text("H *")
         self.assertEqual(repr(rp), f"<RP{rp.pk}: H *>")
 
     def test_cascade_delete(self):
@@ -224,20 +230,22 @@ class TestRP(TestCase):
             num_rps = len(RP.objects.all())
             num_states = len(State.objects.all())
             base_text = equivalent_strings[0]
-            base_rp = RP.get_or_create_from_text(base_text)
+            base_rp, created = RP.get_or_create_from_text(base_text)
+            self.assertTrue(created)
             self.assertEqual(len(RP.objects.all()), num_rps + 1)
             self.assertEqual(len(State.objects.all()), num_states + 1)
             for equivalent_text in equivalent_strings:
-                equivalent_rp = RP.get_or_create_from_text(equivalent_text)
+                equivalent_rp, created = RP.get_or_create_from_text(equivalent_text)
                 with self.subTest(base_text=base_text, equivalent_text=equivalent_text):
                     # assert that the pulled RPs are the same
+                    self.assertFalse(created)
                     self.assertEqual(equivalent_rp, base_rp)
             # assert that no new RPs and States were created
             self.assertEqual(len(RP.objects.all()), num_rps + 1)
             self.assertEqual(len(State.objects.all()), num_states + 1)
 
     def test_charge(self):
-        self.assertEqual(RP.get_or_create_from_text("H").charge, 0)
-        self.assertEqual(RP.get_or_create_from_text("H+").charge, 1)
-        self.assertEqual(RP.get_or_create_from_text("He+2").charge, 2)
-        self.assertEqual(RP.get_or_create_from_text("He-2").charge, -2)
+        self.assertEqual(RP.get_or_create_from_text("H")[0].charge, 0)
+        self.assertEqual(RP.get_or_create_from_text("H+")[0].charge, 1)
+        self.assertEqual(RP.get_or_create_from_text("He+2")[0].charge, 2)
+        self.assertEqual(RP.get_or_create_from_text("He-2")[0].charge, -2)

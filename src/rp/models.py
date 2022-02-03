@@ -21,18 +21,36 @@ class Species(QualifiedIDMixin, models.Model):
     def get_from_text(cls, text):
         """Looks for a Species with equivalent canonicalised version of the
         text. Uses pyvalem Formula.__repr__ for the canonicalisation.
-        If not present, Species.DoesNotExist is raised."""
+        If not present, Species.DoesNotExist is raised.
+
+        Parameters
+        ----------
+        text : str
+
+        Returns
+        -------
+        Species
+        """
         text_can = repr(Formula(text))
         return cls.objects.get(text=text_can)
 
     @classmethod
     def get_or_create_from_text(cls, text):
         """Looks for a Species with equivalent canonicalised version of the
-        text."""
+        text.
+
+        Parameters
+        ----------
+        text : str
+
+        Returns
+        -------
+        (Species, bool)
+        """
         pyvalem_formula = Formula(text)
         text_can = repr(pyvalem_formula)
         try:
-            species = cls.objects.get(text=text_can)
+            return cls.objects.get(text=text_can), False
         except cls.DoesNotExist:
             # re-instantiate the pyvalem_formula with canonicalised
             # text to canonicalise html also:
@@ -40,7 +58,7 @@ class Species(QualifiedIDMixin, models.Model):
             species = cls.objects.create(
                 text=text_can, charge=pyvalem_formula.charge, html=pyvalem_formula.html
             )
-        return species
+            return species, True
 
 
 class RP(QualifiedIDMixin, models.Model):
@@ -59,21 +77,39 @@ class RP(QualifiedIDMixin, models.Model):
     def get_from_text(cls, text):
         """Looks for RP with equivalent canonicalised version of the
         text. Uses pyvalem StatefulSpecies.__repr__ for the canonicalisation.
-        If not present, RP.DoesNotExist is raised."""
+        If not present, RP.DoesNotExist is raised.
+
+        Parameters
+        ----------
+        text : str
+
+        Returns
+        -------
+        RP
+        """
         text_can = repr(StatefulSpecies(text))
         return cls.objects.get(text=text_can)
 
     @classmethod
     def get_or_create_from_text(cls, text):
         """Looks for a Species with equivalent canonicalised version of the
-        text."""
+        text.
+
+        Parameters
+        ----------
+        text : str
+
+        Returns
+        -------
+        (RP, bool)
+        """
         pyvalem_stateful_species = StatefulSpecies(text)
         text_can = repr(pyvalem_stateful_species)
         try:
-            rp = cls.objects.get(text=text_can)
+            return cls.objects.get(text=text_can), False
         except cls.DoesNotExist:
             pyvalem_formula = pyvalem_stateful_species.formula
-            species = Species.get_or_create_from_text(repr(pyvalem_formula))
+            species, _ = Species.get_or_create_from_text(repr(pyvalem_formula))
             # re-instantiate the pyvalem_stateful_species with canonicalised
             # text to canonicalise html also and sort the states consistently
             # with the text and html:
@@ -90,7 +126,7 @@ class RP(QualifiedIDMixin, models.Model):
                     html=pyvalem_state.html,
                     state_type=State.STATE_TYPE_MAP[pyvalem_state.__class__.__name__],
                 )
-        return rp
+            return rp, True
 
     @property
     def charge(self):
