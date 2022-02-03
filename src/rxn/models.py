@@ -1,5 +1,3 @@
-import warnings
-
 from django.db import models
 from pyvalem.reaction import Reaction as PVReaction
 
@@ -59,72 +57,51 @@ class Reaction(QualifiedIDMixin, models.Model):
         return cls.objects.filter(text=text_can)
 
     @classmethod
-    def create_from_text(cls, text, comment="", process_type_abbreviations=()):
-        """Create a reaction instance. Always creates, even if an instance
-        with equivalent text already exists. In this case, it raises a
-        UserWarning. This is because multiple equivalent reactions might need
-        to exist with different comments and process types.
-        If some of the species from the reaction text do not exist, they
-        will be created to create the reaction.
-        The process types with abbreviations passed must exist already."""
-        process_types = [
-            ProcessType.objects.get(abbreviation=abbrev)
-            for abbrev in process_type_abbreviations
-        ]
-
-        # WARNING: this will not stop creating a duplicate
-        # (although it will raise a Warning.)
-        found_instances = cls.all_from_text(text)
-        if len(found_instances):
-            msg = (
-                f'Creating a new instance of reaction "{text}" '
-                f"({comment}, {process_type_abbreviations}), "
-                f"while the following reactions are already present "
-                f"in the database:\n"
-            )
-            for r in found_instances:
-                r_pt = ", ".join(pt.abbreviation for pt in r.process_types.all())
-                msg += f"{str(r)} ({r.comment}, ({r_pt}))\n"
-            warnings.warn(msg)
-
-        pyvalem_reaction = PVReaction(text)
-        text_can = repr(pyvalem_reaction)
-        # re-instantiate to sync html representation with the
-        # canonicalised text returned by PVReaction.__repr__:
-        pyvalem_reaction = PVReaction(text_can)
-        html = pyvalem_reaction.html
-
-        # create the Reaction object:
-        reaction = cls.objects.create(text=text_can, html=html, comment=comment)
-        for attr, Intermediate in zip(
-            ["reactants", "products"], [ReactantList, ProductList]
-        ):
-            for stoich, stateful_species in getattr(pyvalem_reaction, attr):
-                for _ in range(stoich):
-                    Intermediate.objects.create(
-                        reaction=reaction,
-                        rp=RP.get_or_create_from_text(repr(stateful_species)),
-                    )
-        for process_type in process_types:
-            reaction.process_types.add(process_type)
-
-        return reaction
+    def get_from_text(cls, text, comment="", process_type_abbreviations=()):
+        """Looks for an RP with equivalent canonicalised version of the text AND
+        identical comment AND the same process_type_abbreviations.
+        So this should be strictly named "get_from_data" but we'll keep it like this
+        for consistency reasons.
+        """
+        text_can = repr(PVReaction(text))
+        all_with_text_and_comment = cls.objects.filter(text=text_can, comment=comment)
+        for reaction in all_with_text_and_comment:
+            if sorted(pt.abbreviation for pt in reaction.process_types.all()) == sorted(
+                process_type_abbreviations
+            ):
+                return reaction
+        raise cls.DoesNotExist
 
     @classmethod
     def get_or_create_from_text(cls, text, comment="", process_type_abbreviations=()):
-        found_instances = cls.all_from_text(text).filter(comment=comment)
-        if process_type_abbreviations:
-            process_type_abbreviations = set(process_type_abbreviations)
-            for instance in found_instances:
-                these_process_type_abbrevs = set(
-                    process_type.abbreviation
-                    for process_type in instance.process_types.all()
-                )
-                if these_process_type_abbrevs == process_type_abbreviations:
-                    return instance, False
-        elif found_instances:
-            return found_instances[0], False
-        return (cls.create_from_text(text, comment, process_type_abbreviations), True)
+        try:
+            reaction = cls.get_from_text(text, comment, process_type_abbreviations)
+        except cls.DoesNotExist:
+            # canonicalised text and html:
+            text_can = repr(PVReaction(text))
+            pyvalem_reaction = PVReaction(text_can)  # to reset the html to canonic.
+            html = pyvalem_reaction.html
+            # create the Reaction object:
+            reaction = cls.objects.create(text=text_can, html=html, comment=comment)
+            # populate the reactants and products with RP instances:
+            for attr, Intermediate in zip(
+                ["reactants", "products"], [ReactantList, ProductList]
+            ):
+                for stoich, stateful_species in getattr(pyvalem_reaction, attr):
+                    for _ in range(stoich):
+                        Intermediate.objects.create(
+                            reaction=reaction,
+                            rp=RP.get_or_create_from_text(repr(stateful_species)),
+                        )
+            # assign the ProcessTypes:
+            process_types = [
+                ProcessType.objects.get(abbreviation=abbrev)
+                for abbrev in process_type_abbreviations
+            ]
+            for process_type in process_types:
+                reaction.process_types.add(process_type)
+
+        return reaction
 
     @property
     def molecularity(self):

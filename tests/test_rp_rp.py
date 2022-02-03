@@ -1,6 +1,6 @@
 from django.test import TestCase
 from pyvalem.formula import FormulaParseError
-from pyvalem.state import StateParseError
+from pyvalem.states import StateParseError
 from pyvalem.stateful_species import StatefulSpeciesError
 
 from rp.models import Species, RP, State
