@@ -139,6 +139,11 @@ class Reaction(QualifiedIDMixin, models.Model):
         """Return the molecularity of the reaction (number of reactants)."""
         return self.reactants.count()
 
+    def _reset_html(self):
+        pyvalem_reaction = PVReaction(self.text)
+        self.html = pyvalem_reaction.html
+        self.save()
+
 
 class ReactantList(models.Model):
     """ReactantList implements the ManyToMany relationship between an reaction

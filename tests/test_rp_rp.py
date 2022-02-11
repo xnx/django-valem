@@ -220,12 +220,11 @@ class TestRP(TestCase):
     def test_canonical_state_representation(self):
         # Existing species must be found even if I pass text with e.g. SIGMA
         # instead of Σ.
-        for equivalent_strings in [
-            ["H2 1sigma", "H2 1σ", "H2 1sigma1", "H2 1σ1"],
-            ["H2 1SIGMA-", "H2 1Σ-"],
-            ["H2 v=0", "H2 v = 0", "H2 v= 0", "H2 v =0"],
-            ["H2 J=3/2", "H2 J=1.5"],
-            ["H2 state=unknown", "H2 state = unknown"],
+        for equivalent_strings, nstates in [
+            (["H2 1sigma", "H2 1σ", "H2 1sigma1", "H2 1σ1"], 1),
+            (["H2 1SIGMA-", "H2 1Σ-"], 1),
+            (["H2 v=0 J=2", "H2 v=0;J=2", "H2 v=0; J=2", "H2 v=0,J=2"], 2),
+            (["H2 J=3/2", "H2 J=1.5"], 1),
         ]:
             num_rps = len(RP.objects.all())
             num_states = len(State.objects.all())
@@ -233,7 +232,7 @@ class TestRP(TestCase):
             base_rp, created = RP.get_or_create_from_text(base_text)
             self.assertTrue(created)
             self.assertEqual(len(RP.objects.all()), num_rps + 1)
-            self.assertEqual(len(State.objects.all()), num_states + 1)
+            self.assertEqual(len(State.objects.all()), num_states + nstates)
             for equivalent_text in equivalent_strings:
                 equivalent_rp, created = RP.get_or_create_from_text(equivalent_text)
                 with self.subTest(base_text=base_text, equivalent_text=equivalent_text):
@@ -242,7 +241,7 @@ class TestRP(TestCase):
                     self.assertEqual(equivalent_rp, base_rp)
             # assert that no new RPs and States were created
             self.assertEqual(len(RP.objects.all()), num_rps + 1)
-            self.assertEqual(len(State.objects.all()), num_states + 1)
+            self.assertEqual(len(State.objects.all()), num_states + nstates)
 
     def test_charge(self):
         self.assertEqual(RP.get_or_create_from_text("H")[0].charge, 0)

@@ -29,7 +29,7 @@ class TestReaction(TestCase):
         )
 
     def test_all_from_text_single(self):
-        r_str = "H + H + He -> H + H **;n=2 + He *;n=0"
+        r_str = "H + H + He -> H + H **;n=2 + He * n=0"
         self.assertEqual(len(Reaction.all_from_text(r_str)), 0)
         self.assertEqual(len(RP.objects.all()), 0)
 
@@ -53,7 +53,7 @@ class TestReaction(TestCase):
         for r_text in [
             "2H + He -> H + H **;n=2 + He *;n=0",
             "H + H + He -> H + H **;n=2 + He *;n=0",
-            "2H + He -> H + H n=2;** + He *;n=0",
+            "2H + He -> H + H n=2, ** + He *;n=0",
             "2H + He -> H + H n=2;** + He n=0;*",
             "H + H + He -> H + H n=2;** + He n=0;*",
         ]:
@@ -174,3 +174,16 @@ class TestReaction(TestCase):
     def test_repr(self):
         r, _ = Reaction.get_or_create_from_text("2H -> H + H", comment="foo")
         self.assertEqual(repr(r), f"<R{r.id}: H + H → H + H>")
+
+    def test_reset_html(self):
+        r, _ = Reaction.get_or_create_from_text("Be+4 + H 2p1 m=1 → Be+4 + H *")
+        self.assertEqual(repr(r), f"<R{r.id}: Be+4 + H 2p;m=1 → Be+4 + H *>")
+        self.assertEqual(
+            r.html, "Be<sup>4+</sup> + H 2p m=1 → Be<sup>4+</sup> + H <sup>*</sup>"
+        )
+
+        r.text = "Be+4 + H 2p1 |m|=1 → Be+4 + H *"
+        r._reset_html()
+        self.assertEqual(
+            r.html, "Be<sup>4+</sup> + H 2p |m|=1 → Be<sup>4+</sup> + H <sup>*</sup>"
+        )
