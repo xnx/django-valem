@@ -67,7 +67,9 @@ class Reaction(QualifiedIDMixin, models.Model):
         return cls.objects.filter(text=text_can)
 
     @classmethod
-    def get_from_text(cls, text, comment="", process_type_abbreviations=(), strict=True):
+    def get_from_text(
+        cls, text, comment="", process_type_abbreviations=(), strict=True
+    ):
         """Looks for an RP with equivalent canonicalised version of the text AND
         identical comment AND the same process_type_abbreviations.
         So this should be strictly named "get_from_data" but we'll keep it like this
@@ -93,7 +95,9 @@ class Reaction(QualifiedIDMixin, models.Model):
         raise cls.DoesNotExist
 
     @classmethod
-    def get_or_create_from_text(cls, text, comment="", process_type_abbreviations=(), strict=True):
+    def get_or_create_from_text(
+        cls, text, comment="", process_type_abbreviations=(), strict=True
+    ):
         """
 
         Parameters
@@ -107,11 +111,16 @@ class Reaction(QualifiedIDMixin, models.Model):
         (Reaction, bool)
         """
         try:
-            return cls.get_from_text(text, comment, process_type_abbreviations, strict), False
+            return (
+                cls.get_from_text(text, comment, process_type_abbreviations, strict),
+                False,
+            )
         except cls.DoesNotExist:
             # canonicalised text and html:
             text_can = repr(PVReaction(text, strict=strict))
-            pyvalem_reaction = PVReaction(text_can, strict=strict)  # to reset the html to canonic.
+            pyvalem_reaction = PVReaction(
+                text_can, strict=strict
+            )  # to reset the html to canonic.
             html = pyvalem_reaction.html
             # create the Reaction object:
             reaction = cls.objects.create(text=text_can, html=html, comment=comment)
