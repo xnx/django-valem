@@ -5,6 +5,7 @@ from pyvalem.reaction import Reaction as PVReaction
 
 from rp.models import RP, Species, State
 from rxn.models import Reaction, ProcessType, ReactantList, ProductList
+from pyvalem.reaction import ReactionParseError
 
 
 class TestReaction(TestCase):
@@ -147,6 +148,14 @@ class TestReaction(TestCase):
         self.assertEqual(Species.objects.count(), 4)
         self.assertEqual(RP.objects.count(), 4)
         self.assertEqual(State.objects.count(), 0)
+
+    def test_nonstrict_reactions(self):
+        s_r = "Li + e- -> Li+"
+
+        self.assertRaises(ReactionParseError, Reaction.get_or_create_from_text, s_r)
+
+        r, _ = Reaction.get_or_create_from_text(s_r, strict=False)
+        self.assertEqual(repr(r), f"<R{r.id}: e- + Li → Li+>")
 
     def test_molecularity(self):
         reaction, _ = Reaction.get_or_create_from_text("5H + 5e- -> H- + H- + 3H-")

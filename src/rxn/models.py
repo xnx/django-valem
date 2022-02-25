@@ -1,5 +1,6 @@
 from django.db import models
 from pyvalem.reaction import Reaction as PVReaction
+from pyvalem.reaction import ReactionParseError
 
 from _utils.models import QualifiedIDMixin
 from rp.models import RP
@@ -49,7 +50,7 @@ class Reaction(QualifiedIDMixin, models.Model):
         return self.text
 
     @classmethod
-    def all_from_text(cls, text):
+    def all_from_text(cls, text, strict=True):
         """Uses pyvalem to get a canonicalised version of the text and filters
         the database objects by that text. If no reactions equivalent to passed
         text are found, returns an empty query.
@@ -62,11 +63,11 @@ class Reaction(QualifiedIDMixin, models.Model):
         -------
         Query
         """
-        text_can = repr(PVReaction(text))
+        text_can = repr(PVReaction(text, strict=strict))
         return cls.objects.filter(text=text_can)
 
     @classmethod
-    def get_from_text(cls, text, comment="", process_type_abbreviations=()):
+    def get_from_text(cls, text, comment="", process_type_abbreviations=(), strict=True):
         """Looks for an RP with equivalent canonicalised version of the text AND
         identical comment AND the same process_type_abbreviations.
         So this should be strictly named "get_from_data" but we'll keep it like this
@@ -82,7 +83,7 @@ class Reaction(QualifiedIDMixin, models.Model):
         -------
         Reaction
         """
-        text_can = repr(PVReaction(text))
+        text_can = repr(PVReaction(text, strict=strict))
         all_with_text_and_comment = cls.objects.filter(text=text_can, comment=comment)
         for reaction in all_with_text_and_comment:
             if sorted(pt.abbreviation for pt in reaction.process_types.all()) == sorted(
@@ -92,7 +93,7 @@ class Reaction(QualifiedIDMixin, models.Model):
         raise cls.DoesNotExist
 
     @classmethod
-    def get_or_create_from_text(cls, text, comment="", process_type_abbreviations=()):
+    def get_or_create_from_text(cls, text, comment="", process_type_abbreviations=(), strict=True):
         """
 
         Parameters
@@ -106,11 +107,11 @@ class Reaction(QualifiedIDMixin, models.Model):
         (Reaction, bool)
         """
         try:
-            return cls.get_from_text(text, comment, process_type_abbreviations), False
+            return cls.get_from_text(text, comment, process_type_abbreviations, strict), False
         except cls.DoesNotExist:
             # canonicalised text and html:
-            text_can = repr(PVReaction(text))
-            pyvalem_reaction = PVReaction(text_can)  # to reset the html to canonic.
+            text_can = repr(PVReaction(text, strict=strict))
+            pyvalem_reaction = PVReaction(text_can, strict=strict)  # to reset the html to canonic.
             html = pyvalem_reaction.html
             # create the Reaction object:
             reaction = cls.objects.create(text=text_can, html=html, comment=comment)
@@ -140,7 +141,11 @@ class Reaction(QualifiedIDMixin, models.Model):
         return self.reactants.count()
 
     def _reset_html(self):
-        pyvalem_reaction = PVReaction(self.text)
+        try:
+            pyvalem_reaction = PVReaction(self.text)
+        except ReactionParseError:
+            pyvalem_reaction = PVReaction(self.text, strict=False)
+
         self.html = pyvalem_reaction.html
         self.save()
 
