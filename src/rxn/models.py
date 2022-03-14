@@ -44,6 +44,7 @@ class Reaction(QualifiedIDMixin, models.Model):
 
     text = models.CharField(max_length=256, editable=False)
     html = models.CharField(max_length=1024, editable=False)
+    latex = models.CharField(max_length=1024, editable=False)
     comment = models.CharField(max_length=1024, blank=True)
 
     def __str__(self):
@@ -122,8 +123,11 @@ class Reaction(QualifiedIDMixin, models.Model):
                 text_can, strict=strict
             )  # to reset the html to canonic.
             html = pyvalem_reaction.html
+            latex = pyvalem_reaction.latex
             # create the Reaction object:
-            reaction = cls.objects.create(text=text_can, html=html, comment=comment)
+            reaction = cls.objects.create(
+                text=text_can, html=html, latex=latex, comment=comment
+            )
             # populate the reactants and products with RP instances:
             for attr, Intermediate in zip(
                 ["reactants", "products"], [ReactantList, ProductList]

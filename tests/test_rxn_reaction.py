@@ -196,3 +196,12 @@ class TestReaction(TestCase):
         self.assertEqual(
             r.html, "Be<sup>4+</sup> + H 2p |m|=1 → Be<sup>4+</sup> + H <sup>*</sup>"
         )
+
+    def test_latex(self):
+        r, _ = Reaction.get_or_create_from_text(
+            "e- + BeH+ X(1Σ+) v=0 -> BeH+ X(1Σ+) v=3 + e-"
+        )
+        self.assertEqual(
+            r.latex,
+            r"\mathrm{e}^- + \mathrm{Be}\mathrm{H}^{+} \; X{}^{1}\Sigma^+; \; v=0 \rightarrow \mathrm{Be}\mathrm{H}^{+} \; X{}^{1}\Sigma^+; \; v=3 + \mathrm{e}^-",
+        )
