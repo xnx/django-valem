@@ -203,5 +203,5 @@ class TestReaction(TestCase):
         )
         self.assertEqual(
             r.latex,
-            r"\mathrm{e}^- + \mathrm{Be}\mathrm{H}^{+} \; X{}^{1}\Sigma^+; \; v=0 \rightarrow \mathrm{Be}\mathrm{H}^{+} \; X{}^{1}\Sigma^+; \; v=3 + \mathrm{e}^-",
+            r"\mathrm{e}^- + \mathrm{Be}\mathrm{H}^{+} \; X{}^{1}\Sigma^+ \; v=0 \rightarrow \mathrm{Be}\mathrm{H}^{+} \; X{}^{1}\Sigma^+ \; v=3 + \mathrm{e}^-",
         )

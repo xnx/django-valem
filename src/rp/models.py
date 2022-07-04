@@ -14,14 +14,11 @@ class Species(QualifiedIDMixin, models.Model):
     html = models.CharField(max_length=200)
     charge = models.SmallIntegerField(default=0, null=True)
 
-
     class Meta:
         verbose_name_plural = "Species"
 
-
     def __str__(self):
         return self.text
-
 
     @classmethod
     def get_from_text(cls, text):

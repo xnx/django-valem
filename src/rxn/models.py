@@ -153,7 +153,6 @@ class Reaction(QualifiedIDMixin, models.Model):
         """Return the molecularity of the reaction (number of reactants)."""
         return self.reactants.count()
 
-
     def _reset_html(self):
         try:
             pyvalem_reaction = PVReaction(self.text)
