@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.db import models
 
 # noinspection PyUnresolvedReferences
 class QualifiedIDMixin:
@@ -14,7 +14,10 @@ class QualifiedIDMixin:
         return f"<{self.qualified_id}: {self}>"
 
 
-class ProvenanceMixin:
+class ProvenanceMixin(models.Model):
     added_by_user_id = models.IntegerField(null=True, blank=True)
     time_added = models.DateTimeField(auto_now_add=True)
     time_modified = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
