@@ -64,6 +64,14 @@ class Species(QualifiedIDMixin, models.Model):
             return species, True
 
 
+class SpeciesAlias(models.Model):
+    text = models.CharField(max_length=80, unique=True)
+    species = models.ForeignKey(Species, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.text} -> {self.species.text}"
+
+
 class RP(QualifiedIDMixin, models.Model):
     qid_prefix = "RP"
 
@@ -91,7 +99,37 @@ class RP(QualifiedIDMixin, models.Model):
         RP
         """
         text_can = repr(StatefulSpecies(text))
+        # TODO Look up Species formula in SpeciesAlias table.
         return cls.objects.get(text=text_can)
+
+    @classmethod
+    def filter_from_text(cls, text):
+        """Filters for RP using canonicalised version of the StatefulSpecies
+        represented by text, having first resolved the Species formula into
+        its canonical form for this database by looking it up in the
+        SpeciesAlias table.
+
+        Parameters
+        ----------
+        text : str
+
+        Returns
+        -------
+        django.db.models.query.QuerySet
+        """
+
+        ss = StatefulSpecies(text)
+
+        try:
+            species = SpeciesAlias.objects.get(text=ss.formula).species
+            rps = cls.objects.filter(species__text=species.text)
+        except SpeciesAlias.DoesNotExist:
+            rps = cls.objects.filter(species__text=text)
+
+        for state in ss.states:
+            rps = rps.filter(state__text=state)
+
+        return rps
 
     @classmethod
     def get_or_create_from_text(cls, text):
