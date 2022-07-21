@@ -7,7 +7,7 @@ from rp.models import Species, SpeciesAlias, RP
 class TestSpeciesAlias(TestCase):
     def setUp(self):
         self.HD = Species.objects.create(text="HD")
-        self.HD_aliases = ["HD", "DH", "H(2H)", "(2H)H", "(1H)(2H)", "(2H)(1H)"]
+        self.HD_aliases = ["DH", "H(2H)", "(2H)H", "(1H)(2H)", "(2H)(1H)"]
         for HD_alias in self.HD_aliases:
             SpeciesAlias.objects.create(species=self.HD, text=HD_alias)
 
@@ -39,7 +39,7 @@ class TestSpeciesAlias(TestCase):
         self.assertEqual(rps.count(), 1)
         self.assertEqual(rps[0], rp1)
 
-        rps = RP.filter_from_text("HD X(1SIGMA+g)")
+        rps = RP.filter_from_text("DH X(1SIGMA+g)")
         self.assertEqual(rps.count(), 2)
         self.assertEqual(rps[0], rp1)
         self.assertEqual(rps[1], rp2)

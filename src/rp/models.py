@@ -124,7 +124,7 @@ class RP(QualifiedIDMixin, models.Model):
             species = SpeciesAlias.objects.get(text=ss.formula).species
             rps = cls.objects.filter(species__text=species.text)
         except SpeciesAlias.DoesNotExist:
-            rps = cls.objects.filter(species__text=text)
+            rps = cls.objects.filter(species__text=ss.formula)
 
         for state in ss.states:
             rps = rps.filter(state__text=state)
