@@ -149,6 +149,38 @@ class TestReaction(TestCase):
         self.assertEqual(RP.objects.count(), 4)
         self.assertEqual(State.objects.count(), 0)
 
+    def test_get_or_create_from_text_ordered(self):
+        self.assertEqual(Reaction.objects.count(), 0)
+        self.assertEqual(Species.objects.count(), 0)
+        self.assertEqual(RP.objects.count(), 0)
+        self.assertEqual(State.objects.count(), 0)
+
+        r1, created = Reaction.get_or_create_from_text(
+            "H 1s + H+ -> H+ + H+ + e-", comment="atom first"
+        )
+        r2, created = Reaction.get_or_create_from_text(
+            "H+ + H 1s -> H+ + H+ + e-", comment="ion first"
+        )
+        self.assertEqual(r1.ordered_text, r2.ordered_text)
+
+        r3, created = Reaction.get_or_create_from_text(
+            "H2 + e- + H2 + e- <=> e- + H4+2 + 2e- + e-", comment="test 1"
+        )
+        r4, created = Reaction.get_or_create_from_text(
+            "e- + 2H2 + e- <=> H4+2 + 4e-", comment="test 1"
+        )
+        self.assertEqual(r3.ordered_text, r4.ordered_text)
+        self.assertEqual(r3.ordered_text, "2e- + H2 + H2 ⇌ 4e- + H4+2")
+
+        r5, created = Reaction.get_or_create_from_text(
+            "H+ + Li 2s -> Li+", strict=False
+        )
+        r6, created = Reaction.get_or_create_from_text(
+            "Li 2s + H+ -> Li+", strict=False
+        )
+        self.assertEqual(r5.ordered_text, r6.ordered_text)
+        self.assertEqual(r5.ordered_text, "H+ + Li 2s → Li+")
+
     def test_nonstrict_reactions(self):
         s_r = "Li + e- -> Li+"
 

@@ -43,6 +43,7 @@ class Reaction(QualifiedIDMixin, models.Model):
     process_types = models.ManyToManyField(ProcessType)
 
     text = models.CharField(max_length=256, editable=False)
+    ordered_text = models.CharField(max_length=256, editable=False)
     html = models.CharField(max_length=1024, editable=False)
     latex = models.CharField(max_length=1024, editable=False)
     comment = models.CharField(max_length=1024, blank=True)
@@ -122,11 +123,16 @@ class Reaction(QualifiedIDMixin, models.Model):
             pyvalem_reaction = PVReaction(
                 text_can, strict=strict
             )  # to reset the html to canonic.
+            ordered_text = cls._get_ordered_text(pyvalem_reaction)
             html = pyvalem_reaction.html
             latex = pyvalem_reaction.latex
             # create the Reaction object:
             reaction = cls.objects.create(
-                text=text_can, html=html, latex=latex, comment=comment
+                text=text_can,
+                ordered_text=ordered_text,
+                html=html,
+                latex=latex,
+                comment=comment,
             )
             # populate the reactants and products with RP instances:
             for attr, Intermediate in zip(
@@ -147,6 +153,21 @@ class Reaction(QualifiedIDMixin, models.Model):
                 reaction.process_types.add(process_type)
 
             return reaction, True
+
+    @classmethod
+    def _get_ordered_text(cls, pyvalem_reaction):
+        """
+        Return a text string for pyvalem_reaction in which the reactants and
+        products are ordered according to...
+
+        """
+
+        s_reactants, s_products = repr(pyvalem_reaction).split(pyvalem_reaction.sep)
+        reactants = sorted([s.strip() for s in s_reactants.split(" + ")])
+        products = sorted([s.strip() for s in s_products.split(" + ")])
+        s_reactants = " + ".join(reactants)
+        s_products = " + ".join(products)
+        return f" {pyvalem_reaction.sep} ".join([s_reactants, s_products])
 
     @property
     def molecularity(self):
