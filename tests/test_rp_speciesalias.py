@@ -10,6 +10,16 @@ class TestSpeciesAlias(TestCase):
         self.HD_aliases = ["DH", "H(2H)", "(2H)H", "(1H)(2H)", "(2H)(1H)"]
         for HD_alias in self.HD_aliases:
             SpeciesAlias.objects.create(species=self.HD, text=HD_alias)
+        self.Xep34 = Species.objects.create(text="Xe+34")
+        self.Xep34_inchi = SpeciesAlias.objects.create(
+            species=self.Xep34, text="InChI=1S/Xe/q+34"
+        )
+        self.Xep34_inchi2 = SpeciesAlias.objects.create(
+            species=self.Xep34, text="1S/Xe/q+34"
+        )
+        self.Xep34_inchikey = SpeciesAlias.objects.create(
+            species=self.Xep34, text="CBYSBAHMMKPXKC-UHFFFAOYSA-N"
+        )
 
     def test_HD_aliases(self):
         for HD_alias in self.HD_aliases:
@@ -46,3 +56,15 @@ class TestSpeciesAlias(TestCase):
 
         rps = RP.filter_from_text("LiH")
         self.assertFalse(rps.exists())
+
+    def test_inchi_aliases(self):
+        rp1, _ = RP.get_or_create_from_text(text="Xe+34 1s2.2p3 3P_1")
+        for inchi_alias in (
+            self.Xep34,
+            self.Xep34_inchi,
+            self.Xep34_inchi2,
+            self.Xep34_inchikey,
+        ):
+            rps = RP.filter_from_text(inchi_alias.text, inchi_lookup=True)
+            self.assertEqual(rps.count(), 1)
+            self.assertEqual(rps[0], rp1)

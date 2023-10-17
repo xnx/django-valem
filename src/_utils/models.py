@@ -1,6 +1,7 @@
 from django.db import models
 from django.db import models
 
+
 # noinspection PyUnresolvedReferences
 class QualifiedIDMixin:
     qid_prefix = "-"

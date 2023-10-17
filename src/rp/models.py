@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from pyvalem.formula import Formula
 from pyvalem.stateful_species import StatefulSpecies
@@ -103,7 +104,7 @@ class RP(QualifiedIDMixin, models.Model):
         return cls.objects.get(text=text_can)
 
     @classmethod
-    def filter_from_text(cls, text):
+    def filter_from_text(cls, text, inchi_lookup=False):
         """Filters for RP using canonicalised version of the StatefulSpecies
         represented by text, having first resolved the Species formula into
         its canonical form for this database by looking it up in the
@@ -117,6 +118,14 @@ class RP(QualifiedIDMixin, models.Model):
         -------
         django.db.models.query.QuerySet
         """
+
+        patt = "[A-Z]{14}-[A-Z]{10}-N"
+        if text.startswith("InChI=") or text.startswith("1S") or re.match(patt, text):
+            try:
+                species = SpeciesAlias.objects.get(text=text).species
+                return cls.objects.filter(species__text=species.text)
+            except SpeciesAlias.DoesNotExist:
+                return []
 
         ss = StatefulSpecies(text)
 
