@@ -68,3 +68,11 @@ class TestSpeciesAlias(TestCase):
             rps = RP.filter_from_text(inchi_alias.text, inchi_lookup=True)
             self.assertEqual(rps.count(), 1)
             self.assertEqual(rps[0], rp1)
+
+            rps = RP.filter_from_text(inchi_alias.text + " 3P_1", inchi_lookup=True)
+            self.assertEqual(rps.count(), 1)
+            self.assertEqual(rps[0], rp1)
+
+        # A non-existent InChI
+        rps = RP.filter_from_text("InChI=1S/He/q+3", inchi_lookup=True)
+        self.assertEqual(rps.count(), 0)

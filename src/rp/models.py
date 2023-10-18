@@ -120,12 +120,15 @@ class RP(QualifiedIDMixin, models.Model):
         """
 
         patt = "[A-Z]{14}-[A-Z]{10}-N"
-        if text.startswith("InChI=") or text.startswith("1S") or re.match(patt, text):
+        if text.startswith("InChI=") or text.startswith("1S/") or re.match(patt, text):
+            chunks = text.split()
+            species_text, states = chunks[0], chunks[1:]
             try:
-                species = SpeciesAlias.objects.get(text=text).species
-                return cls.objects.filter(species__text=species.text)
+                species = SpeciesAlias.objects.get(text=species_text).species
             except SpeciesAlias.DoesNotExist:
-                return []
+                return cls.objects.none()
+            # Replace the InChI / InChIKey with the canonical text representation
+            text = " ".join([species.text] + states)
 
         ss = StatefulSpecies(text)
 
